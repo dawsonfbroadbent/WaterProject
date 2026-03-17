@@ -2,41 +2,90 @@ import { useEffect, useState } from 'react';
 import type { Project } from './types/Project';
 
 function ProjectList() {
- 
-    const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [pageNum, setPageNum] = useState<number>(1);
+  const [totalProjects, setTotalProjects] = useState<number>(0);
 
-    useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-                const response = await fetch('https://localhost:5000/api/Water/AllProjects');
-                const data = await response.json();
-                setProjects(data);
-            } catch (error) {
-                console.error('Error fetching projects:', error);
-            }
-        };
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await fetch(
+          `https://localhost:5000/api/Water/AllProjects?pageSize=${pageSize}&pageNum=${pageNum}`
+        );
+        const data = await response.json();
+        setProjects(data.projects);
+        setTotalProjects(data.totalNumProjects);
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+      }
+    };
 
-        fetchProjects();
-    }, []);
+    fetchProjects();
+  }, [pageSize, pageNum]);
 
-    return (
+  const totalPages = Math.ceil(totalProjects / pageSize);
+
+  return (
     <>
-    <h1>Water Project</h1>
-    <br />
-    {projects.map((project) => (
-        <div id="projectCard" key={project.projectId}>
-            <h3>{project.projectName}</h3>
-            <ul>
-                <li>{project.projectType}</li>
-                <li>{project.projectRegionalProgram}</li>
-                <li>Impact: {project.projectimpact} Individuals Served</li>
-                <li>Phase: {project.projectPhase}</li>
-                <li>Functionality Status: {project.projectFunctionalityStatus}</li>
+      <h1>Water Project</h1>
+      <br />
+
+      {projects.map((project) => (
+        <div id='projectCard' className='card' key={project.projectId}>
+          <h3 className='card-title'>{project.projectName}</h3>
+          <div className='card-body'>
+            <ul className='list-unstyled'>
+              <li><strong>Project Type:</strong> {project.projectType}</li>
+              <li><strong>Regional Program:</strong> {project.projectRegionalProgram}</li>
+              <li><strong>Impact:</strong> {project.projectImpact} Individuals Served</li>
+              <li><strong>Phase:</strong> {project.projectPhase}</li>
+              <li><strong>Functionality Status:</strong> {project.projectFunctionalityStatus}</li>
             </ul>
+          </div>
         </div>
-    ))}
+      ))}
+
+      <br />
+
+      <button disabled={pageNum === 1} onClick={() => setPageNum(pageNum - 1)}>
+        Previous
+      </button>
+
+      {[...Array(totalPages)].map((_, i) => (
+        <button 
+        key={i + 1} 
+        onClick={() => setPageNum(i + 1)}
+        disabled={pageNum === i + 1}>
+          {i + 1}
+        </button>
+      ))}
+
+      <button
+        disabled={pageNum === totalPages}
+        onClick={() => setPageNum(pageNum + 1)}
+      >
+        Next
+      </button>
+
+      <br />
+
+      <label>
+        Results per page:
+        <select
+          value={pageSize}
+          onChange={(p) => {
+            setPageSize(Number(p.target.value));
+            setPageNum(1);
+          }}
+        >
+          <option value='5'>5</option>
+          <option value='10'>10</option>
+          <option value='20'>20</option>
+        </select>
+      </label>
     </>
- );
+  );
 }
 
 export default ProjectList;

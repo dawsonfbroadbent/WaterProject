@@ -3,7 +3,7 @@ export type Project = {
     projectName: string;
     projectType: string;
     projectRegionalProgram: string;
-    projectimpact: number;
+    projectImpact: number;
     projectPhase: string;
     projectFunctionalityStatus: string;
 }
