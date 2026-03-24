@@ -12,14 +12,22 @@ public class WaterController : ControllerBase
     public WaterController(WaterDbContext tempContext) => _watercontext = tempContext;
 
     [HttpGet("AllProjects")]
-    public IActionResult Get(int pageSize = 10, int pageNum =1)
+    public IActionResult Get(int pageSize = 10, int pageNum =1, [FromQuery] List<string>? projectTypes= null)
     {
-        var projects = _watercontext.Projects
+        var query = _watercontext.Projects.AsQueryable();
+
+        if (projectTypes != null && projectTypes.Any())
+        {
+            query = query.Where(p => projectTypes.Contains(p.ProjectType));
+        }
+        
+        var totalNumProjects = query.Count();
+
+        var projects = query
             .Skip((pageNum -1) *  pageSize)
             .Take(pageSize)
             .ToList();
         
-        var totalNumProjects = _watercontext.Projects.Count();
 
         var returnedObject = new
         {
@@ -30,11 +38,14 @@ public class WaterController : ControllerBase
         return Ok(returnedObject);
     }
 
-    [HttpGet("FunctionalProjects")]
-    public IEnumerable<Project> GetFunctionalProjects()
+    [HttpGet("GetProjectTypes")]
+    public IActionResult GetProjectTypes()
     {
-        var functionalProjects =
-            _watercontext.Projects.Where(p => p.ProjectFunctionalityStatus == "Functional").ToList();
-        return functionalProjects;
+        var projectTypes =
+            _watercontext.Projects
+                .Select(p => p.ProjectType)
+                .Distinct()
+                .ToList();
+        return Ok(projectTypes);
     }
 }
