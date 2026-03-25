@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import type { Project } from './types/Project';
+import type { Project } from '../types/Project';
+import { useNavigate } from 'react-router-dom';
 
 function ProjectList({ selectedCategories }: { selectedCategories: string[] }) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [pageSize, setPageSize] = useState<number>(10);
   const [pageNum, setPageNum] = useState<number>(1);
   const [totalProjects, setTotalProjects] = useState<number>(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -42,6 +44,10 @@ function ProjectList({ selectedCategories }: { selectedCategories: string[] }) {
               <li><strong>Phase:</strong> {project.projectPhase}</li>
               <li><strong>Functionality Status:</strong> {project.projectFunctionalityStatus}</li>
             </ul>
+
+            <button className="btn btn-success" 
+            onClick={() => navigate(`/donate/${project.projectName}/${project.projectId}`)}
+            >Donate</button>
           </div>
         </div>
       ))}
