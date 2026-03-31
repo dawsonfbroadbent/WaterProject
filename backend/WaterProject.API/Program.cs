@@ -8,7 +8,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-builder.Services.AddCors();
+builder.Services.AddCors(options => options.AddPolicy("AllowReactApp", policy =>
+{
+    policy.WithOrigins("http://localhost:3000")
+           .AllowAnyHeader()
+           .AllowAnyMethod();
+}));
 
 builder.Services.AddDbContext<WaterDbContext>(options => 
     options.UseSqlite(builder.Configuration.GetConnectionString("WaterConnection")));
@@ -21,7 +26,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseCors(x => x.WithOrigins("http://localhost:3000"));
+app.UseCors("AllowReactApp");
 
 app.UseHttpsRedirection();
 

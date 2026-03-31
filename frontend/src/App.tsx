@@ -4,6 +4,7 @@ import ProjectsPage from './pages/ProjectsPage';
 import CartPage from './pages/CartPage';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
+import AdminProjectsPage from './pages/AdminProjectsPage';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/donate/:projectName/:projectId" element={<DonatePage />} />
             <Route path="/cart" element={<CartPage />} />
+            <Route path="/admin/projects" element={<AdminProjectsPage />} />
           </Routes>
         </Router>
       </CartProvider>
